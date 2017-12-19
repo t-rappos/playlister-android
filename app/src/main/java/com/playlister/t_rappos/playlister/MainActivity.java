@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         tvUsername.setText(UserManager.getUsername(this));
         tvEmail.setText(UserManager.getEmail(this));
         tvPassword.setText(UserManager.getPassword(this));
+
     }
 
 }

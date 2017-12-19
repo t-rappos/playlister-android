@@ -95,6 +95,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        DefaultLoginTask lt = new DefaultLoginTask(this);
+        lt.execute();
     }
 
     private void populateAutoComplete() {
@@ -291,6 +294,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
+    }
+
+    public class DefaultLoginTask extends AsyncTask<Void, Void, Boolean>{
+
+        private Context context = null;
+
+        public DefaultLoginTask(Context c){
+            context = c;
+        }
+        @Override
+
+        protected Boolean doInBackground(Void... voids) {
+            Messenger messenger = new Messenger();
+            if (messenger.validateConnection(context)){
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            return null;
+        }
     }
 
     /**
