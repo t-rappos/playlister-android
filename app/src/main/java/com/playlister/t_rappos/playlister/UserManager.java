@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
  */
 public class UserManager {
 
-    public static void saveCredentials(Context context, String username, String password){
+    static void saveCredentials(Context context, String username, String password){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("username", username);
@@ -22,27 +22,44 @@ public class UserManager {
         editor.commit();
     }
 
-    public static void saveEmail(Context context, String email){
+    static void saveEmail(Context context, String email){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("email", email);
         editor.commit();
     }
 
-    public static String getUsername(Context context){
+    static String getUsername(Context context){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         String username = settings.getString("username", "");
         return username;
     }
 
-    public static String getPassword(Context context){
+    static String getPassword(Context context){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         String password = settings.getString("password", "");
         return password;
     }
 
-    public static String getEmail(Context context){
+    static String getEmail(Context context){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         return settings.getString("email", "");
+    }
+
+    //return -1 if no id was found
+    static int getDeviceId(Context context){
+        SharedPreferences settings = context.getSharedPreferences("USER",0);
+        return settings.getInt("deviceId", -1);
+    }
+
+    static boolean hasDeviceId(Context context){
+        return (getDeviceId(context) != -1);
+    }
+
+    static void saveDeviceId(Context context, int deviceId){
+        SharedPreferences settings = context.getSharedPreferences("USER",0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("deviceId", deviceId);
+        editor.commit();
     }
 }
