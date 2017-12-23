@@ -1,5 +1,7 @@
 package com.playlister.t_rappos.playlister;
 
+import android.media.MediaMetadataRetriever;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
@@ -39,9 +41,28 @@ public class Track {
                 sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
             }
             this.hash = sb.toString();
-            System.out.println(f.getName() + " : " + this.hash);
+            //System.out.println(f.getName() + " : " + this.hash);
             fis.close();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //https://stackoverflow.com/questions/11327954/how-to-extract-metadata-from-mp3
+    private void getFileProperties(File f){
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        try{
+            mmr.setDataSource(f.getAbsolutePath());
+            artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            if(artist == null || artist.compareTo("")==0){
+                artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR);
+                if(artist == null || artist.compareTo("")==0){
+                    artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+                }
+            }
+            title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+        } catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -51,5 +72,6 @@ public class Track {
         path = f.getParent();
         filesize = f.length();
         generateHash(f);
+        getFileProperties(f);
     }
 }
