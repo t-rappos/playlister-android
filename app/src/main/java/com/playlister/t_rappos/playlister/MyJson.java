@@ -14,11 +14,13 @@ public class MyJson {
         Gson gson = gsonBuilder.create();
         return gson.toJson(o);
     }
-    public static DeviceInfo toDeviceInfo(String s){
+
+    static Object toObject(String s, Class c){
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
-        return gson.fromJson(s, DeviceInfo.class);
+        return gson.fromJson(s, c);
     }
+
     public static ArrayList<String> toStringList(String s){
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();

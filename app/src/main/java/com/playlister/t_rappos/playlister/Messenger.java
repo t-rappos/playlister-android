@@ -21,13 +21,12 @@ import com.google.api.client.http.javanet.NetHttpTransport;
  */
 public class Messenger {
     //private static HttpTransport httpTransport;
-    private boolean valid = false;
     private static NetHttpTransport httpTransport;
     //private static HttpTransport httpTransport;
     private String apiUrl =  "http://192.168.0.11:8080/";
 
     boolean validateConnection(Context c){
-        valid = sendGETRequest(c, "api/me") != null;
+        Boolean valid = sendGETRequest(c, "api/me") != null; //credentials are correct
         if(valid){
             //if(!UserManager.hasDeviceId(c)){  //TODO: enabled this, also check if server hasnt been reset since last id was gathered
                 loadDeviceId(c);
@@ -36,8 +35,35 @@ public class Messenger {
         return valid;
     }
 
-    public void sendTracks(Context c, TrackCollection tracks) {
-        sendPOSTRequest(c, "tracks", MyJson.toJson(tracks));
+
+    boolean checkIfServerDBHasReset(Context c){
+        boolean serverHasReset = true;
+        HttpResponse r = sendGETRequest(c, "status/");
+        if(r!=null) {
+            try {
+                ServerStatus s = (ServerStatus)MyJson.toObject(r.parseAsString(), ServerStatus.class);
+                long lastResetId = UserManager.getServerDBResetId(c);
+                if(s.dbResetId == lastResetId){
+                    System.out.println("Server has not reset since last run");
+                    serverHasReset = false;
+                } else {
+                    System.out.println("Server has reset since last run");
+                    UserManager.saveServerDBResetId(c, s.dbResetId);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return serverHasReset;
+    }
+
+    public void sendTracks(Context c, TrackCollection toAdd, TrackCollection toRemove) {
+        if(!toAdd.tracks.isEmpty()){
+            sendPOSTRequest(c, "tracks",MyJson.toJson(toAdd));
+        }
+        if(!toRemove.tracks.isEmpty()) {
+            sendPOSTRequest(c, "removetracks", MyJson.toJson(toRemove));
+        }
         System.out.println("Sent tracks to server");
     }
 
@@ -54,20 +80,21 @@ public class Messenger {
     }
 
     void loadDeviceId(Context c){
-        //if(!UserManager.hasDeviceId()){   //TODO: enabled this, also check if server hasnt been reset since last id was gathered
-        HttpResponse r = sendGETRequest(c, "device/"+generateDeviceName(c) + "/ANDROID");
-        if(r != null){
-            try {
-                DeviceInfo di = MyJson.toDeviceInfo(r.parseAsString());
-                UserManager.saveDeviceId(c, (int)di.id);
-                System.out.println("Acquired device id = " + di.id + " for device name " + generateDeviceName(c));
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(!UserManager.hasDeviceId(c) || checkIfServerDBHasReset(c)){   //TODO: enabled this, also check if server hasnt been reset since last id was gathered
+            HttpResponse r = sendGETRequest(c, "device/"+generateDeviceName(c) + "/ANDROID");
+            if(r != null){
+                try {
+                    TrackStore.invalidateStore(c);
+                    DeviceInfo di = (DeviceInfo)MyJson.toObject(r.parseAsString(), DeviceInfo.class);
+                    UserManager.saveDeviceId(c, (int)di.id);
+                    System.out.println("Acquired device id = " + di.id + " for device name " + generateDeviceName(c));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Using last device id " + UserManager.getDeviceId(c));
             }
         }
-        //} else {
-        //    System.out.println("Loaded device id = " + UserManager.getDeviceId());
-        //}
     }
 
     HttpResponse sendPOSTRequest(Context context, String endpoint, String body){
@@ -80,7 +107,9 @@ public class Messenger {
             ba.initialize(request);
             return request.execute();
         } catch(Exception e){
+            System.out.println("Error sendPOSTRequest : " + endpoint);
             System.err.println(e.getMessage());
+            System.out.println("Error sendPOSTRequest : " + body);
             return null;
         }
     }

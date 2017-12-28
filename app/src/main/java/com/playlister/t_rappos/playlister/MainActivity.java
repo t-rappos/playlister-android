@@ -59,9 +59,8 @@ public class MainActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             System.out.println("Scanning for tracks");
             Messenger m = new Messenger();
-            TrackCollection col = TrackScanner.scan();
-            col.deviceId = UserManager.getDeviceId(context); //TODO: make sure it is impossible to sendTracks a TrackCol where deviceId == 0...
-            m.sendTracks(context,col);
+            TrackStore store = TrackScanner.scan(context);
+            m.sendTracks(context, store.toAdd, store.toRemove);
             return true;
         }
 

@@ -1,5 +1,6 @@
 package com.playlister.t_rappos.playlister;
 
+import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public class TrackScanner {
         return col;
     }
 
-    public static TrackCollection scan(){
+    public static TrackStore scan(Context c){
         File storageDir = new File("/mnt/");
         if(storageDir.isDirectory()){
             String[] dirList = storageDir.list();
@@ -76,8 +77,8 @@ public class TrackScanner {
         long dt = System.nanoTime() - startTime;
         System.out.println("Completed in " + (float)dt/1000000f + " ms");
 
-        //TODO: set device id
-        //col.deviceId = UserManager.getDeviceId();
-        return col;
+        TrackStore trackStore = new TrackStore();
+        trackStore.checkInTracks(c, col);
+        return trackStore;
     }
 }

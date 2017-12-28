@@ -62,4 +62,18 @@ public class UserManager {
         editor.putInt("deviceId", deviceId);
         editor.commit();
     }
+
+    static long getServerDBResetId(Context context){
+        SharedPreferences settings = context.getSharedPreferences("USER",0);
+        return settings.getLong("dbResetId", 0);
+    }
+
+    static void saveServerDBResetId(Context context, long id){
+        SharedPreferences settings = context.getSharedPreferences("USER",0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("dbResetId", id);
+        editor.commit();
+    }
+
+
 }
