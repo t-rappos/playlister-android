@@ -2,9 +2,9 @@ package com.playlister.t_rappos.playlister; /**
  * Created by Tom-2015 on 12/19/2017.
  */
 
-import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import PlaylisterMain2.IUserManager;
 
 
 import java.util.prefs.Preferences;
@@ -12,9 +12,14 @@ import java.util.prefs.Preferences;
 /**
  * Created by Thomas Rappos (6336361) on 12/18/2017.
  */
-public class UserManager {
+public class UserManager implements IUserManager {
+    private Context context;
 
-    static void saveCredentials(Context context, String username, String password){
+    public UserManager(Context c){
+        context = c;
+    }
+
+    public void saveCredentials(String username, String password){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("username", username);
@@ -22,53 +27,53 @@ public class UserManager {
         editor.commit();
     }
 
-    static void saveEmail(Context context, String email){
+    public  void saveEmail(String email){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("email", email);
         editor.commit();
     }
 
-    static String getUsername(Context context){
+    public String getUsername(){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         String username = settings.getString("username", "");
         return username;
     }
 
-    static String getPassword(Context context){
+    public String getPassword(){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         String password = settings.getString("password", "");
         return password;
     }
 
-    static String getEmail(Context context){
+    public String getEmail(){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         return settings.getString("email", "");
     }
 
     //return -1 if no id was found
-    static int getDeviceId(Context context){
+    public int getDeviceId(){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         return settings.getInt("deviceId", -1);
     }
 
-    static boolean hasDeviceId(Context context){
-        return (getDeviceId(context) != -1);
+    public boolean hasDeviceId(){
+        return (getDeviceId() != -1);
     }
 
-    static void saveDeviceId(Context context, int deviceId){
+    public void saveDeviceId(int deviceId){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt("deviceId", deviceId);
         editor.commit();
     }
 
-    static long getServerDBResetId(Context context){
+    public long getServerDBResetId(){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         return settings.getLong("dbResetId", 0);
     }
 
-    static void saveServerDBResetId(Context context, long id){
+    public void saveServerDBResetId(long id){
         SharedPreferences settings = context.getSharedPreferences("USER",0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("dbResetId", id);

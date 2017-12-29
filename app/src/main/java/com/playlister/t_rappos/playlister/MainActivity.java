@@ -1,7 +1,6 @@
 package com.playlister.t_rappos.playlister;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,13 +9,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+import PlaylisterMain2.Messenger;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    UserManager userManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        userManager = new UserManager(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -34,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
         TextView tvEmail = (TextView) findViewById(R.id.textEmail);
         TextView tvPassword = (TextView) findViewById(R.id.textPassword);
 
-        tvUsername.setText(UserManager.getUsername(this));
-        tvEmail.setText(UserManager.getEmail(this));
-        tvPassword.setText(UserManager.getPassword(this));
+        tvUsername.setText(userManager.getUsername());
+        tvEmail.setText(userManager.getEmail());
+        tvPassword.setText(userManager.getPassword());
 
         ScanAndSend s = new ScanAndSend(this);
         s.execute();
@@ -58,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             System.out.println("Scanning for tracks");
-            Messenger m = new Messenger();
-            TrackStore store = TrackScanner.scan(context);
-            m.sendTracks(context, store.toAdd, store.toRemove);
+            Messenger m = new Messenger(userManager,getString(R.string.api_url));
+            TrackStore store = TrackScanner.scan(context, userManager);
+            m.sendTracks(store.toAdd, store.toRemove);
             return true;
         }
 

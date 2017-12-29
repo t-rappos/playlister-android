@@ -31,9 +31,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import PlaylisterMain2.Messenger;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -65,9 +65,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    UserManager userManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        userManager = new UserManager(this);
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -306,10 +309,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
 
         protected Boolean doInBackground(Void... voids) {
-            Messenger messenger = new Messenger();
-            if (messenger.validateConnection(context)){
+            System.out.println("About to try and log user in by default");
+            Messenger messenger = new Messenger(userManager, getString(R.string.api_url));
+            if (messenger.validateConnection()){
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
+            } else {
+                System.out.println("Couldn't validate user login by default");
             }
             return null;
         }
@@ -325,13 +331,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         UserLoginTask(Context c, String email, String password) {
             context = c;
-            UserManager.saveCredentials(c, email,password);
+            userManager.saveCredentials(email,password);
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            Messenger m = new Messenger();
-            return m.validateConnection(context);
+            Messenger m = new Messenger(userManager,getString(R.string.api_url));
+            return m.validateConnection();
         }
 
         @Override

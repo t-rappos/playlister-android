@@ -8,11 +8,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import PlaylisterMain2.TrackCollection;
+import PlaylisterMain2.Track;
 
 /**
  * Created by Tom-2015 on 12/22/2017.
  */
 
+/*
 class TrackCollection{
     public long deviceId;
     public ArrayList<Track> tracks = new ArrayList<Track>();
@@ -25,7 +28,7 @@ class TrackCollection{
         tracks.addAll(tc.tracks);
     }
 };
-
+*/
 
 public class TrackScanner {
 
@@ -49,10 +52,11 @@ public class TrackScanner {
         System.out.println("scanning :" + d);
         File[] files = new File(d).listFiles();
         TrackCollection col = new TrackCollection();
+        FilePropertyReader reader = new FilePropertyReader();
         if (files != null && files.length > 0){
             for (File f:files) {
                 if(isFileValid(f)){
-                    Track t = new Track(f);
+                    Track t = new Track(f,reader);
                     col.addTrack(t);
                 } else if(f.isDirectory()){
                     col.addTrackCollection(scanRecursive(f.getAbsolutePath()));
@@ -62,7 +66,7 @@ public class TrackScanner {
         return col;
     }
 
-    public static TrackStore scan(Context c){
+    public static TrackStore scan(Context c, UserManager userManager){
         File storageDir = new File("/mnt/");
         if(storageDir.isDirectory()){
             String[] dirList = storageDir.list();
@@ -77,8 +81,8 @@ public class TrackScanner {
         long dt = System.nanoTime() - startTime;
         System.out.println("Completed in " + (float)dt/1000000f + " ms");
 
-        TrackStore trackStore = new TrackStore();
-        trackStore.checkInTracks(c, col);
+        TrackStore trackStore = new TrackStore(c);
+        trackStore.checkInTracks(col, userManager);
         return trackStore;
     }
 }
