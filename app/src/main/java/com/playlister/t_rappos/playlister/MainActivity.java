@@ -1,5 +1,6 @@
 package com.playlister.t_rappos.playlister;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import PlaylisterMain2.Messenger;
 public class MainActivity extends AppCompatActivity {
 
     UserManager userManager;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Scanning for music");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgress(0);
+        progressDialog.show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -46,23 +54,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class ScanAndSend extends AsyncTask<Void, Void, Boolean> {
+    public class ScanAndSend extends AsyncTask<Void, Integer, Boolean> {
 
         private Context context = null;
+        private int max = 0;
 
         ScanAndSend(Context c) {
             context = c;
         }
 
+
         @Override
         protected Boolean doInBackground(Void... params) {
             System.out.println("Scanning for tracks");
             Messenger m = new Messenger(userManager,getString(R.string.api_url));
-            TrackStore store = TrackScanner.scan(context, userManager);
+            TrackStore store = TrackScanner.scan(context, userManager,this);
             m.sendTracks(store.toAdd, store.toRemove);
             return true;
         }
@@ -70,11 +81,30 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             System.out.println("Sent music tracks successfully");
+            progressDialog.hide();
         }
 
         @Override
         protected void onCancelled() {
             System.out.println("Cancelled scanning");
+        }
+
+
+        public void setProgressMax(Integer i){
+            max = i;
+            progressDialog.setMax(i);
+        }
+
+        //public wrapper hack...
+        public void doProgress(Integer i){
+            this.publishProgress(i);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            super.onProgressUpdate(progress);
+            System.out.println("onProgressUpdate update " + progress[0]);
+            progressDialog.setProgress(progress[0]);
         }
     }
 
