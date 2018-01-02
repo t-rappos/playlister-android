@@ -56,6 +56,7 @@ public class TrackScanner {
     public static TrackStore scan(Context c, UserManager userManager, MainActivity.ScanAndSend task){
         File storageDir = new File("/mnt/");
         maxFolderCount = 0;
+        currentFolderCount = 0;
         if(storageDir.isDirectory()){
             maxFolderCount += FolderScanner.countFolders(storageDir);
             String[] dirList = storageDir.list();

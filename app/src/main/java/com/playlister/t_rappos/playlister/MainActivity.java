@@ -9,7 +9,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
 import PlaylisterMain2.Messenger;
 
 
@@ -44,6 +48,16 @@ public class MainActivity extends AppCompatActivity {
         TextView tvUsername = (TextView) findViewById(R.id.textUsername);
         TextView tvEmail = (TextView) findViewById(R.id.textEmail);
         TextView tvPassword = (TextView) findViewById(R.id.textPassword);
+
+        Button logoutButton = (Button)findViewById(R.id.buttonLogout);
+        //CheckBox keepLoggedInCB = (CheckBox) findViewById(R.id.checkBoxStayLoggedIn);
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                userManager.saveCredentials("","");
+                finish();
+            }
+        });
 
         tvUsername.setText(userManager.getUsername());
         tvEmail.setText(userManager.getEmail());

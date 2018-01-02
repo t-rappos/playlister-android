@@ -312,6 +312,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             System.out.println("About to try and log user in by default");
             Messenger messenger = new Messenger(userManager, getString(R.string.api_url));
             if (messenger.validateConnection()){
+                TrackStore store = new TrackStore(context); //TODO: make invalidateStore(), a static function?
+                messenger.loadDeviceId(store);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             } else {
@@ -337,7 +339,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             Messenger m = new Messenger(userManager,getString(R.string.api_url));
-            return m.validateConnection();
+            Boolean res = m.validateConnection();
+            TrackStore store = new TrackStore(context); //TODO: make invalidateStore(), a static function?
+            m.loadDeviceId(store);
+            return res;
         }
 
         @Override
