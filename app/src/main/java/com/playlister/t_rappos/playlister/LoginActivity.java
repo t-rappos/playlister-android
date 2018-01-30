@@ -310,8 +310,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         protected Boolean doInBackground(Void... voids) {
             System.out.println("About to try and log user in by default");
-            Messenger messenger = new Messenger(userManager, getString(R.string.api_url));
-            if (messenger.validateConnection()){
+            Messenger messenger = new Messenger(userManager);
+            if (messenger.validateConnection(getString(R.string.local_api_url))
+                    || messenger.validateConnection(getString(R.string.remote_api_url))){
                 TrackStore store = new TrackStore(context); //TODO: make invalidateStore(), a static function?
                 messenger.loadDeviceId(store);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -338,8 +339,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            Messenger m = new Messenger(userManager,getString(R.string.api_url));
-            Boolean res = m.validateConnection();
+            Messenger m = new Messenger(userManager);
+            Boolean res = m.validateConnection(getString(R.string.local_api_url))
+                    || m.validateConnection(getString(R.string.remote_api_url));
             TrackStore store = new TrackStore(context); //TODO: make invalidateStore(), a static function?
             m.loadDeviceId(store);
             return res;
