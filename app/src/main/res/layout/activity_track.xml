@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.playlister.t_rappos.playlister.MainActivity">
+    tools:context="com.playlister.t_rappos.playlister.TrackActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,8 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_main" />
+    <include layout="@layout/content_track" />
 
 </android.support.design.widget.CoordinatorLayout>

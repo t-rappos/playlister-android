@@ -2,6 +2,7 @@ package com.playlister.t_rappos.playlister;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,30 +28,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         userManager = new UserManager(this);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Scanning for music");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setIndeterminate(false);
-        progressDialog.setProgress(0);
-        progressDialog.show();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         TextView tvUsername = (TextView) findViewById(R.id.textUsername);
         TextView tvEmail = (TextView) findViewById(R.id.textEmail);
         TextView tvPassword = (TextView) findViewById(R.id.textPassword);
 
         Button logoutButton = (Button)findViewById(R.id.buttonLogout);
+        Button scanButton = (Button)findViewById(R.id.buttonScan);
+        Button playlistsButton = (Button) findViewById(R.id.buttonPlaylists);
         //CheckBox keepLoggedInCB = (CheckBox) findViewById(R.id.checkBoxStayLoggedIn);
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setMessage("Scanning for music");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setIndeterminate(false);
+                progressDialog.setProgress(0);
+                progressDialog.show();
+                ScanAndSend s = new ScanAndSend(MainActivity.this);
+                s.execute();
+            }
+        });
+
+        playlistsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+                startActivity(intent);
+            }
+        });
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -63,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
         tvEmail.setText(userManager.getEmail());
         tvPassword.setText(userManager.getPassword());
 
-        ScanAndSend s = new ScanAndSend(this);
-        s.execute();
     }
 
 
