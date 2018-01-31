@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
         userManager = new UserManager(this);
         setContentView(R.layout.activity_main);
 
-
         TextView tvUsername = (TextView) findViewById(R.id.textUsername);
         TextView tvEmail = (TextView) findViewById(R.id.textEmail);
         TextView tvPassword = (TextView) findViewById(R.id.textPassword);
@@ -93,15 +92,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             System.out.println("Scanning for tracks");
-            Messenger m = new Messenger(userManager);
-            //TODO: this re-validation isn't neccessary.
-            Boolean valid = m.validateConnection(getString(R.string.local_api_url))
-                    ||  m.validateConnection(getString(R.string.remote_api_url));
-            if(!valid){
-                return false;
-            }
+
             TrackStore store = TrackScanner.scan(context, userManager,this);
-            m.sendTracks(store.toAdd, store.toRemove);
+            LoginActivity.gMessenger.sendTracks(store.toAdd, store.toRemove);
             return true;
         }
 
